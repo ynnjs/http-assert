@@ -80,6 +80,22 @@ class Assertion {
         }
     }
 
+    gt( n, ...args ) {
+        return this.assert( this.value() > n, ...args );
+    }
+
+    gte( n, ...args ) {
+        return this.assert( this.value() >= n, ...args );
+    }
+
+    lt( n, ...args ) {
+        return this.assert( this.value() < n, ...args );
+    }
+
+    lte( n, ...args ) {
+        return this.assert( this.value() <= n, ...args );
+    }
+
     between( interval, ...args ) {
         return this.assert( is.between( this.value(), ...interval ), ...args );
     }
@@ -94,8 +110,28 @@ class Assertion {
         return this.assert( reg.test( this.value() ), ...args );
     }
 
+    equal( data, ...args ) {
+        return this.assert( data == this.value(), ...args );
+    }
+
+    notEqual( data, ...args ) {
+        return this.assert( data != this.value(), ...args );
+    }
+
+    strictEqual( data, ...args ) {
+        return this.assert( data === this.value(), ...args );
+    }
+
+    notStrictEqual( data, ...args ) {
+        return this.assert( data !== this.value(), ...args );
+    }
+
     deepEqual( data, ...args ) {
         return this.assert( deepEqual( this.value(), data ), ...args );
+    }
+
+    notDeepEqual( data, ...args ) {
+        return this.assert( !deepEqual( this.value(), data ), ...args );
     }
 
     json( ...args ) {
@@ -115,7 +151,7 @@ class Assertion {
     }
 
     custom( fn, ...args ) {
-        const res = fn( this.value() );
+        const res = fn.call( this, this.value(), this );
         if( !is.promise( res ) ) {
             return this.assert( res, ...args );
         }
@@ -163,4 +199,7 @@ function assert( value, status, msg, opts ) {
     }
     throw createError( status, msg, opts );
 }
+
+assert.Assertion = Assertion;
+
 module.exports = assert;
