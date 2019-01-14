@@ -8,8 +8,7 @@ function katch( fn ) {
     }
 }
 
-describe( 'Methods', () => {
-   
+describe( 'basic', () => {
     it( 'assert', () => {
         expect( assert( 'a' ) ).toBeTruthy();
         expect( assert( 'a', 400 ) ).toBeTruthy();
@@ -19,9 +18,18 @@ describe( 'Methods', () => {
         expect( error ).toHaveProperty( 'message', 'e' );
     } );
 
+    it( 'error', () => {
+        const ins = assert( 400, {} );
+        expect( ins.message ).toEqual( undefined );
+    } );
+} );
+
+describe( 'Methods', () => {
+   
     it( 'default', () => {
         expect( assert( null ).default( 'x' ).value() ).toEqual( 'x' );
         expect( assert( null ).default( 'x' ).custom( () => false ).value() ).toEqual( 'x' );
+        expect( assert( 'a' ).default( 'x' ).custom( () => false ).value() ).toEqual( 'x' );
     } );
 
     it( 'length', () => {

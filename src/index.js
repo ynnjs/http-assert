@@ -135,6 +135,7 @@ class Assertion {
         if( this.defaultValue ) {
             this.value( this.defaultValue );
             this.skip = true;
+            return this;
         } else {
             this.throw( ...args );
         }
