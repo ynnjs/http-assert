@@ -7,7 +7,7 @@
         "test": "jest --forceExit",
         "tw": "jest --watch",
         "test-watch": "npm run tw",
-        "lint": "eslint lib --cache -ignore-path .eslintignore",
+        "lint": "eslint src --cache --ignore-path .eslintignore",
         "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
     },
     "repository": {
