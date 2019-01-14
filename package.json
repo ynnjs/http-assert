@@ -1,0 +1,56 @@
+{
+    "name": "http-assert",
+    "version": "0.0.0",
+    "description": "A more powerful http assertion library.",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "jest --forceExit",
+        "tw": "jest --watch",
+        "test-watch": "npm run tw",
+        "lint": "eslint lib --cache -ignore-path .eslintignore",
+        "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ynnjs/http-assert.git"
+    },
+    "engines": {
+        "ndoe": ">=8.0"
+    },
+    "keywords": [
+        "http",
+        "assert",
+        "assertion",
+        "ynn"
+    ],
+    "author": "LvChengbin <lvchengbin59@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ynnjs/http-assert/issues"
+    },
+    "homepage": "https://github.com/ynnjs/http-assert#readme",
+    "jest": {
+        "testMatch": [
+            "**/test/**/*.spec.js"
+        ],
+        "coverageReporters": [
+            "text-summary",
+            "text",
+            "lcov"
+        ],
+        "collectCoverageFrom": [
+            "lib/**/*.js"
+        ],
+        "testEnvironment": "node"
+    },
+    "devDependencies": {
+        "eslint": "^5.12.0",
+        "jest": "^23.6.0",
+        "pre-commit": "^1.2.2"
+    },
+    "dependencies": {
+        "@lvchengbin/is": "0.0.25",
+        "deep-equal": "^1.0.1",
+        "http-errors": "^1.7.1"
+    }
+}

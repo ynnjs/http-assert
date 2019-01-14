@@ -1,0 +1,165 @@
+const deepEqual = require( 'deep-equal' );
+const createError = require( 'http-errors' );
+const is = require( '@lvchengbin/is' );
+const types = require( './types' );
+
+const VALUE = Symbol( 'value' );
+
+/**
+ * assert( body.status, 400, 'message' )
+ *   .is( 'int', 400, 'message' )
+ *   .is( 'lowercase', 400, 'message' )
+ *   .between( [ 1, 5 ], 400, 'message' )
+ *   .length( [ 0, 1000 ], 400, 'message' )
+ *   .regex( /^\d+$/, 400, 'message' )
+ *   .json( fn, 400, 'message' )
+ *   .custom( fn, 400, 'message' )
+ */
+class Assertion {
+    constructor( value, status, msg, opts ) {
+        this.value( value );
+        this.status = status;
+        if( !is.string( msg ) ) {
+            this.msg = null;
+            this.opts = msg;
+        } else {
+            this.msg = msg;
+            this.opts = opts;
+        }
+        this.skip = false;
+        this.promises = [];
+        this.async = false;
+    }
+
+    default( value ) {
+        this.defaultValue = value;
+        if( !this.value() ) {
+            this.value( value );
+            this.skip = true;
+        }
+        return this;
+    }
+
+    value( v ) {
+        if( v ) {
+            this[ VALUE ] = v;
+            return this;
+        }
+        if( this.async ) {
+            return Promise.all( this.promises ).then( () => this[ VALUE ] );
+        }
+        return this[ VALUE ];
+    }
+
+    /**
+     * check the type of a parameter
+     *
+     * supporting type
+     * - email
+     * - int/integer
+     * - ip
+     * - ipv4
+     * - ipv6
+     * - number
+     * - url
+     */
+    is( type, ...args ) {
+        if( !types.hasOwnProperty( type ) ) {
+            throw new TypeError( `Checking unknown type ${type}.` );
+        }
+        const fn = types[ type ];
+
+        if( is.string( fn ) ) {
+            if( !is.function( is[ fn ] ) ) {
+                throw new TypeError( '`Checking unknown type ${type}`' );
+            }
+            return this.assert( is[ fn ]( this.value() ), ...args );
+        }
+        if( is.function( fn ) ) {
+            return this.assert( fn( this.value() ), ...args );
+        }
+    }
+
+    between( interval, ...args ) {
+        return this.assert( is.between( this.value(), ...interval ), ...args );
+    }
+
+    length( interval, ...args ) {
+        const v = this.value();
+        const l = v ? v.length : 0;
+        return this.assert( ( l >= interval[ 0 ] && l <= interval[ 1 ] ), ...args );
+    }
+
+    regex( reg, ...args ) {
+        return this.assert( reg.test( this.value() ), ...args );
+    }
+
+    deepEqual( data, ...args ) {
+        return this.assert( deepEqual( this.value(), data ), ...args );
+    }
+
+    json( ...args ) {
+        let res = false;
+        let fn;
+
+        if( is.function( args[ 0 ] ) ) {
+            fn = args.shift();
+        }
+        try {
+            const json = JSON.parse( this.value() );
+            res = is.function( fn ) ? fn.call( this, json, this ) : true
+        } catch( e ) {
+            res = false;
+        }
+        return this.assert( res, ...args );
+    }
+
+    custom( fn, ...args ) {
+        const res = fn( this.value() );
+        if( !is.promise( res ) ) {
+            return this.assert( res, ...args );
+        }
+        this.async = true;
+        const promise = res.then( r => {
+            this.assert( r, ...args );
+        } ).catch( () => {
+            this.assert( false, ...args );
+        } );
+
+        this.promises.push( promise );
+        return this;
+    }
+
+    assert( value, ...args ) {
+        if( this.skip || value ) return this;
+        if( this.defaultValue ) {
+            this.value( this.defaultValue );
+            this.skip = true;
+        } else {
+            this.throw( ...args );
+        }
+    }
+
+    throw( status, msg, opts ) {
+        if( !is.integer( status ) ) {
+            opts = msg;
+            msg = status;
+            status = this.status;
+        }
+
+        if( !is.string( msg ) && !is.error( msg ) ) {
+            opts = msg;
+            msg = null;
+        }
+        msg || ( msg = this.msg );
+        throw createError( status, msg, opts || this.opts );
+    }
+}
+
+function assert( value, status, msg, opts ) {
+    if( arguments.length === 1 || value ) {
+        return new Assertion( ...arguments );
+    }
+    throw createError( status, msg, opts );
+}
+module.exports = assert;
