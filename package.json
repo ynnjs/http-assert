@@ -7,6 +7,7 @@
         "test": "jest --forceExit",
         "tw": "jest --watch",
         "test-watch": "npm run tw",
+        "test-cov" : "jest --coverage --runInBand --forceExit --detectOpenHandles",
         "lint": "eslint src --cache --ignore-path .eslintignore",
         "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
     },
@@ -39,7 +40,7 @@
             "lcov"
         ],
         "collectCoverageFrom": [
-            "lib/**/*.js"
+            "src/**/*.js"
         ],
         "testEnvironment": "node"
     },
