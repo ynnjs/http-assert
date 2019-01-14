@@ -1,5 +1,5 @@
 {
-    "name": "http-assert",
+    "name": "ynn-http-assert",
     "version": "0.0.0",
     "description": "A more powerful http assertion library.",
     "main": "src/index.js",
