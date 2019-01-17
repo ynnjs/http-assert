@@ -30,6 +30,7 @@ describe( 'Methods', () => {
         expect( assert( null ).default( 'x' ).value() ).toEqual( 'x' );
         expect( assert( null ).default( 'x' ).custom( () => false ).value() ).toEqual( 'x' );
         expect( assert( 'a' ).default( 'x' ).custom( () => false ).value() ).toEqual( 'x' );
+        expect( assert( 'a' ).default().is( 'int' ).value() ).toEqual( undefined );
     } );
 
     it( 'length', () => {
@@ -87,6 +88,12 @@ describe( 'Methods', () => {
         expect( () => assert( 'C', 400 ).between( [ 'A', 'B' ] ) ).toThrow();
     } );
 
+    it( 'in', () => {
+        expect( assert( 'x', 400 ).in( [ 'x', 'y' ] ) ).toBeTruthy();
+        expect( assert( '1', 400 ).in( [ 1, 'x', 'y' ] ) ).toBeTruthy();
+        expect( () => assert( 'x', 400 ).in( [] ) ).toThrow();
+    } );
+
     it( 'is email', () => {
         expect( assert( 'a@b.com', 400 ).is( 'email' ) ).toBeTruthy();
         expect( () => assert( 'b.com', 400 ).is( 'email' ) ).toThrow();
@@ -126,5 +133,9 @@ describe( 'Methods', () => {
     it( 'url', () => {
         expect( assert( 'http://www.baidu.com', 400 ).is( 'url' ) ).toBeTruthy();
         expect( () => assert( '127.0.0.1', 400 ).is( 'url' ) ).toThrow();
+    } );
+
+    it( 'get undefined value', () => {
+        expect( assert( undefined ).value() ).toBeUndefined();
     } );
 } );

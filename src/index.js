@@ -2,6 +2,7 @@ const deepEqual = require( 'deep-equal' );
 const createError = require( 'http-errors' );
 const is = require( '@lvchengbin/is' );
 const types = require( './types' );
+const indexOf = require( './indexof' );
 
 const VALUE = Symbol( 'value' );
 
@@ -29,10 +30,12 @@ class Assertion {
         this.skip = false;
         this.promises = [];
         this.async = false;
+        this.setDefault = false;
     }
 
     default( value ) {
         this.defaultValue = value;
+        this.setDefault = true;
         if( !this.value() ) {
             this.value( value );
             this.skip = true;
@@ -41,7 +44,10 @@ class Assertion {
     }
 
     value( v ) {
-        if( v ) {
+        /**
+         * the default value can be an undefined
+         */
+        if( arguments.length ) {
             this[ VALUE ] = v;
             return this;
         }
@@ -98,6 +104,10 @@ class Assertion {
 
     between( interval, ...args ) {
         return this.assert( is.between( this.value(), ...interval ), ...args );
+    }
+
+    in( haystack, ...args ) {
+        return this.assert( indexOf( haystack, this.value() ) !== -1, ...args );
     }
 
     length( interval, ...args ) {
@@ -168,7 +178,7 @@ class Assertion {
 
     assert( value, ...args ) {
         if( this.skip || value ) return this;
-        if( this.defaultValue ) {
+        if( this.setDefault ) {
             this.value( this.defaultValue );
             this.skip = true;
             return this;
