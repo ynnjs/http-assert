@@ -138,4 +138,8 @@ describe( 'Methods', () => {
     it( 'get undefined value', () => {
         expect( assert( undefined ).value() ).toBeUndefined();
     } );
+
+    it( 'undefined', () => {
+        expect( assert( undefined ).undefined().is( 'int' ).value() ).toBeUndefined();
+    } );
 } );

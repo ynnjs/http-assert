@@ -43,6 +43,12 @@ class Assertion {
         return this;
     }
 
+    undefined() {
+        this.acceptUndefined = true;
+        return this;
+    }
+
+
     value( v ) {
         /**
          * the default value can be an undefined
@@ -182,9 +188,9 @@ class Assertion {
             this.value( this.defaultValue );
             this.skip = true;
             return this;
-        } else {
-            this.throw( ...args );
         }
+        if( this.acceptUndefined && is.undefined( this.value() ) ) return this;
+        this.throw( ...args );
     }
 
     throw( status, msg, opts ) {
