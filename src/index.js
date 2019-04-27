@@ -48,6 +48,9 @@ class Assertion {
         return this;
     }
 
+    required( name, code = 400, message ) {
+        return this.assert( this.value(), code, message || `${name} is required` );
+    }
 
     value( v ) {
         /**
@@ -74,6 +77,11 @@ class Assertion {
      * - ipv6
      * - number
      * - url
+     * - @todo date
+     * - @todo time
+     * - @todo dateTime
+     * - @todo timestamp
+     * - @todo mixedTime
      */
     is( type, ...args ) {
         if( !types.hasOwnProperty( type ) ) {
@@ -150,7 +158,7 @@ class Assertion {
         return this.assert( !deepEqual( this.value(), data ), ...args );
     }
 
-    json( ...args ) {
+    jsonstr( ...args ) {
         let res = false;
         let fn;
 
@@ -166,6 +174,33 @@ class Assertion {
         return this.assert( res, ...args );
     }
 
+    json( ...args ) {
+        const value = this.value();
+        let res = is.plainObject( value ) || is.array( value );
+
+        if( !res ) {
+            try {
+                JSON.parse( value );
+                res = true;
+            } catch( e ) {
+                res = false;
+            }
+        }
+        return this.assert( res, ...args );
+    }
+
+    object( ...args ) {
+        const type = [ '*', '{}', '[]' ].indexOf( args[ 0 ] ) > -1 ? args[ 0 ] : '*';
+        const value = this.value();
+        if( type === '[]' ) {
+            return this.assert( is.array( value ), ...args );
+        }
+        if( type === '{}' ) {
+            return this.assert( value && is.object( value ) && !is.array( value ), ...args );
+        } 
+        return this.assert( value && ( is.object( value ) || is.array( value ) ), ...args );
+    }
+
     custom( fn, ...args ) {
         const res = fn.call( this, this.value(), this );
         if( !is.promise( res ) ) {
@@ -179,6 +214,15 @@ class Assertion {
         } );
 
         this.promises.push( promise );
+        return this;
+    }
+
+    mutate( value ) {
+        if( is.function( value ) ) {
+            this.value( value.call( this, this.value() ) );
+            return this;
+        }
+        this.value( value );
         return this;
     }
 

@@ -33,6 +33,22 @@ describe( 'Methods', () => {
         expect( assert( 'a' ).default().is( 'int' ).value() ).toEqual( undefined );
     } );
 
+    it( 'required', () => {
+        try {
+            assert( undefined ).required( 'x' ).value();
+        } catch( e ) {
+            expect( e.message ).toEqual( 'x is required' );
+            expect( e.status ).toEqual( 400 );
+        }
+
+        try {
+            assert( undefined ).required( 'x', 300, 'xxx' ).value();
+        } catch( e ) {
+            expect( e.message ).toEqual( 'xxx' );
+            expect( e.status ).toEqual( 300 );
+        }
+    } );
+
     it( 'length', () => {
         expect( assert( 'abc' ).length( [ 0, 3 ] ) ).toBeTruthy();
         expect( () => assert( 'abc', 400 ).length( [ 0, 1 ] ) ).toThrow();
@@ -49,19 +65,41 @@ describe( 'Methods', () => {
     } );
 
     it( 'json', () => {
-        expect( assert( '{"a":1}' ).json() ).toBeTruthy();
-        expect( () => {
-            assert( '{"a":1}' ).json( function( json ) {
+        expect( assert( { a : 1 } ).json().value() ).toEqual( { a : 1 } );
+        expect( () => assert( 's', 400 ).json().value() ).toThrow();
+
+        expect( () => assert( '{a:1}', 400 ).json().value() ).toThrow();
+        expect( assert( '{"a":1}', 400 ).json().value() ).toEqual( '{"a":1}' );
+    } );
+
+    it( 'object', () => {
+        expect( assert( {x:1} ).object().value() ).toEqual( {x:1} ); 
+        expect( assert( {x:1} ).object('{}').value() ).toEqual( {x:1} ); 
+        expect( assert( [1,2] ).object().value() ).toEqual( [1,2] ); 
+        expect( assert( [1,2] ).object('[]').value() ).toEqual( [1,2] ); 
+        expect( () => assert( 'x' ).object() ).toThrow();
+        expect( () => assert( {} ).object( '[]' ) ).toThrow();
+        expect( () => assert( [] ).object( '{}' ) ).toThrow();
+    } );
+
+    it( 'jsonstr', () => {
+        expect( assert( '{"a":1}' ).jsonstr().value() ).toEqual( '{"a":1}' );
+        expect( 
+            assert( '{"a":1}' ).jsonstr( function( json ) {
                 this.value( json );
-            } ).custom( v =>  v.hasOwnProperty( 'a' ) );
-        } ).toBeTruthy();
-        expect( () => assert( '{a:1}', 400 ).json() ).toThrow();
+                return true;
+            } ).custom( v =>  v.hasOwnProperty( 'a' ) )
+            .value()
+        ).toEqual( { a : 1 } );
+        expect( () => assert( '{a:1}', 400 ).jsonstr() ).toThrow();
         expect( () => {
-            assert( '{"a":1}', 400 ).json( function( json ) {
+            assert( '{"a":1}', 400 ).jsonstr( function( json ) {
                 this.value( json );
+                return true;
             } ).custom( v =>  v.hasOwnProperty( 'b' ) );
         } ).toThrow();
     } );
+
 
     it( 'custom sync', () => {
         expect( assert( 'a' ).custom( () => true ) ).toBeTruthy();
@@ -141,5 +179,6 @@ describe( 'Methods', () => {
 
     it( 'undefined', () => {
         expect( assert( undefined ).undefined().is( 'int' ).value() ).toBeUndefined();
+        expect( assert( undefined ).undefined().json().value() ).toBeUndefined();
     } );
 } );
