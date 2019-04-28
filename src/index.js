@@ -127,6 +127,9 @@ class Assertion {
     length( interval, ...args ) {
         const v = this.value();
         const l = v ? v.length : 0;
+        if( !is.array( interval ) ) {
+            return this.assert( l == interval, ...args );
+        }
         return this.assert( ( l >= interval[ 0 ] && l <= interval[ 1 ] ), ...args );
     }
 

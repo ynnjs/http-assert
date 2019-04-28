@@ -52,6 +52,8 @@ describe( 'Methods', () => {
     it( 'length', () => {
         expect( assert( 'abc' ).length( [ 0, 3 ] ) ).toBeTruthy();
         expect( () => assert( 'abc', 400 ).length( [ 0, 1 ] ) ).toThrow();
+        expect( assert( 'abc' ).length( 3 ) ).toBeTruthy();
+        expect( () => assert( 'abc' ).length( 4 ) ).toThrow();
     } );
 
     it( 'regex', () => {
