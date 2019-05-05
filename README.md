@@ -102,4 +102,5 @@ const x = assert( ctx.query.x )
 
 **json(fn, [status], [message], [properties])**
 
+**jsonstr(fn, [status], [message], [properties])**
 **custom(fn, [status], [message], [properties])**

@@ -69,7 +69,7 @@ class Assertion {
     /**
      * check the type of a parameter
      *
-     * supporting type
+     * supported types
      * - email
      * - int/integer
      * - ip
