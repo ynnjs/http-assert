@@ -1,13 +1,13 @@
 {
     "name": "ynn-http-assert",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "A more powerful http assertion library.",
     "main": "src/index.js",
     "scripts": {
         "test": "jest --forceExit",
         "tw": "jest --watch",
         "test-watch": "npm run tw",
-        "test-cov" : "jest --coverage --runInBand --forceExit --detectOpenHandles",
+        "test-cov": "jest --coverage --runInBand --forceExit --detectOpenHandles",
         "lint": "eslint src --cache --ignore-path .eslintignore",
         "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
     },
@@ -16,7 +16,7 @@
         "url": "git+https://github.com/ynnjs/http-assert.git"
     },
     "engines": {
-        "ndoe": ">=8.0"
+        "node": ">=8.0"
     },
     "keywords": [
         "http",
@@ -45,13 +45,13 @@
         "testEnvironment": "node"
     },
     "devDependencies": {
-        "eslint": "^5.16.0",
-        "jest": "^24.7.1",
+        "eslint": "^7.0.0-alpha.0",
+        "jest": "^25.1.0",
         "pre-commit": "^1.2.2"
     },
     "dependencies": {
         "@lvchengbin/is": "0.0.27",
-        "deep-equal": "^1.0.1",
-        "http-errors": "^1.7.2"
+        "deep-equal": "^2.0.1",
+        "http-errors": "^1.7.3"
     }
 }
